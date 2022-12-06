@@ -1,0 +1,3 @@
+[wokwi]
+firmware = "build/blink.uf2"
+elf = "build/blink.elf"
