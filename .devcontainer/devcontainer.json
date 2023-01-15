@@ -21,7 +21,8 @@
 		"twxs.cmake",
 		"eamodio.gitlens",
 		"xaver.clang-format",
-		"chris-hock.pioasm"
+		"chris-hock.pioasm",
+		"Wokwi.wokwi-vscode"
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
