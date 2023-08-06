@@ -1,0 +1,61 @@
+name: Build and test
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      PICO_SDK_PATH: ~/pico/pico-sdk
+      SDK_VERSION: 1.5.0
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache Pico SDK
+        id: cache-pico-sdk
+        uses: actions/cache@v3
+        with:
+          path: ~/pico
+          key: ${{ runner.os }}-pico-sdk-${{ env.SDK_VERSION }}
+      - name: Set up the toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential
+      - name: Set up the Pi Pico SDK
+        if: steps.cache-pico-sdk.outputs.cache-hit != 'true'
+        run: |
+          mkdir ~/pico
+          cd ~/pico
+          git clone https://github.com/raspberrypi/pico-sdk.git --depth 1 --branch ${SDK_VERSION}
+          cd pico-sdk && git submodule update --init && cd ..
+      - name: Compile firmware
+        run: |
+          cd ${{ github.workspace }}
+          mkdir build
+          cd build
+          cmake ..
+          make
+      - name: Upload firmware
+        uses: actions/upload-artifact@v3
+        with:
+          name: firmware
+          path: build/blink.*
+
+  test-on-wokwi:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download firmware
+        uses: actions/download-artifact@v2
+        with:
+          name: firmware
+          path: build
+      - name: Test Pi Pico SDK Blinky on Wokwi
+        uses: wokwi/wokwi-ci-action@v1
+        with:
+          token: ${{ secrets.WOKWI_CLI_TOKEN }}
+          path: /
+          timeout: 1000 # ms
+          scenario: 'blink.test.yaml'

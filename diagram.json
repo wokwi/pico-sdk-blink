@@ -21,6 +21,8 @@
     { "type": "wokwi-led", "id": "led1", "top": 54, "left": 138.2, "attrs": { "color": "red" } }
   ],
   "connections": [
+    [ "pico:GP0", "$serialMonitor:RX", "", [] ], 
+    [ "pico:GP1", "$serialMonitor:TX", "", [] ],
     [ "pico:GP2", "r1:2", "green", [ "v0" ] ],
     [ "r1:1", "led1:A", "green", [ "v0" ] ],
     [ "pico:GND.3", "led1:C", "black", [ "v-19.2", "h9.6" ] ]
